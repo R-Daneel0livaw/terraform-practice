@@ -1,2 +1,2 @@
 # terraform-practice
-Practice IaS creation with Terraform
+Practice IaC creation with Terraform
