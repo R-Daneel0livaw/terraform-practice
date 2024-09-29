@@ -17,56 +17,28 @@ module "build-raw-data" {
   ]
 }
 
-resource "aws_iam_role" "lambda_role1" {
-  name = "lambda-s3-role"
+module "lambda_s3_role_policy" {
+  source                = "../../modules/iam-policy"
+  role_name             = "lambda-s3-role"
+  policy_name           = "lambda-s3-policy"
+  description           = "Policy for Lambda to access S3 and CloudWatch"
+  assume_role_principal = "lambda.amazonaws.com"
 
-  assume_role_policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Action" : "sts:AssumeRole",
-        "Principal" : {
-          "Service" : "lambda.amazonaws.com"
-        },
-        "Effect" : "Allow",
-        "Sid" : ""
-      }
-    ]
-  })
-}
-
-resource "aws_iam_policy" "lambda_s3_policy" {
-  name        = "lambda-s3-policy"
-  description = "Policy for Lambda to access S3 bucket and write logs"
-
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Action" : [
-          "s3:GetObject",
-          "s3:ListBucket"
-        ],
-        "Effect" : "Allow",
-        "Resource" : [
-          "arn:aws:s3:::build-raw-data",
-          "arn:aws:s3:::build-raw-data/*"
-        ]
-      },
-      {
-        "Action" : [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ],
-        "Effect" : "Allow",
-        "Resource" : "arn:aws:logs:*:*:*"
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "lambda_s3_attach" {
-  role       = aws_iam_role.lambda_role1.name
-  policy_arn = aws_iam_policy.lambda_s3_policy.arn
+  statements = [
+    {
+      "Action" : ["s3:GetObject", "s3:ListBucket"],
+      "Effect" : "Allow",
+      "Resource" : [
+        "arn:aws:s3:::build-raw-data",
+        "arn:aws:s3:::build-raw-data/*"
+      ]
+    },
+    {
+      "Action" : ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
+      "Effect" : "Allow",
+      "Resource" : [
+        "arn:aws:logs:*:*:*"
+      ]
+    }
+  ]
 }
