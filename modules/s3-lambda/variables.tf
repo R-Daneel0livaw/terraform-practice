@@ -12,4 +12,5 @@ variable "lambda_functions" {
     runtime     = string
     role_arn    = string
   }))
+  description = "The Lambda functions to attach."
 }
