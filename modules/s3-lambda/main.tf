@@ -22,7 +22,7 @@ resource "aws_s3_bucket_notification" "s3_bucket_notification" {
   dynamic "lambda_function" {
     for_each = aws_lambda_function.lambda
     content {
-      lambda_function_arn = lambda_function.value.arn
+      lambda_function_arn = each.value.arn
       events              = ["s3:ObjectCreated:*"]
     }
   }
