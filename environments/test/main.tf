@@ -2,19 +2,8 @@ provider "aws" {
   region = "us-west-2"
 }
 
-module "build-raw-data" {
-  source      = "../../modules/s3-lambda"
-  bucket_name = "build-raw-data"
-  lambda_functions = [
-    {
-      name        = "bucket1-lambda1"
-      handler     = "bucket1_lambda1.lambda_handler"
-      code_path   = "${path.module}/lambda_code/bucket1_lambda1.py"
-      environment = { BUCKET_NAME = "build-raw-data" }
-      runtime     = "python3.9"
-      role_arn    = aws_iam_role.lambda_role1.arn
-    },
-  ]
+module "constants" {
+  source = "../../modules/global-constants"
 }
 
 module "lambda_s3_role_policy" {
@@ -29,8 +18,8 @@ module "lambda_s3_role_policy" {
       "Action" : ["s3:GetObject", "s3:ListBucket"],
       "Effect" : "Allow",
       "Resource" : [
-        "arn:aws:s3:::build-raw-data",
-        "arn:aws:s3:::build-raw-data/*"
+        "arn:aws:s3:::${module.constants.bucket_name}",
+        "arn:aws:s3:::${module.constants.bucket_name}*"
       ]
     },
     {
@@ -40,5 +29,20 @@ module "lambda_s3_role_policy" {
         "arn:aws:logs:*:*:*"
       ]
     }
+  ]
+}
+
+module "build-raw-data" {
+  source      = "../../modules/s3-lambda"
+  bucket_name = module.constants.bucket_name
+  lambda_functions = [
+    {
+      name        = "bucket1-lambda1"
+      handler     = "bucket1_lambda1.lambda_handler"
+      code_path   = "${path.module}/lambda_code/bucket1_lambda1.py"
+      environment = { BUCKET_NAME = module.constants.bucket_name }
+      runtime     = "python3.9"
+      role_arn    = module.lambda_s3_role_policy.role_arn
+    },
   ]
 }
