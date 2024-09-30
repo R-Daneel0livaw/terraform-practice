@@ -7,7 +7,7 @@ variable "lambda_functions" {
   type = list(object({
     name        = string
     handler     = string
-    code_path   = string
+    code_file   = string
     environment = map(string)
     runtime     = string
     role_arn    = string

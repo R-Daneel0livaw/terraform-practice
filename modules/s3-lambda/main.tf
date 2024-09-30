@@ -9,7 +9,7 @@ resource "aws_lambda_function" "lambda" {
   role          = each.value.role_arn
   handler       = each.value.handler
   runtime       = each.value.runtime
-  filename      = data.archive_file.lambda_zip[each.value.name].output_path
+  filename      = data.archive_file.lambda_zip[each.key].output_path
 
   environment {
     variables = each.value.environment
@@ -22,7 +22,7 @@ resource "aws_s3_bucket_notification" "s3_bucket_notification" {
   dynamic "lambda_function" {
     for_each = aws_lambda_function.lambda
     content {
-      lambda_function_arn = each.value.arn
+      lambda_function_arn = lambda_function.value.arn
       events              = ["s3:ObjectCreated:*"]
     }
   }
@@ -42,6 +42,6 @@ data "archive_file" "lambda_zip" {
   for_each = { for lambda in var.lambda_functions : lambda.name => lambda }
 
   type        = "zip"
-  source_file = each.value.code_path
+  source_file = "${path.module}/lambda_code/${each.value.code_file}"
   output_path = "${path.module}/${each.value.name}.zip"
 }

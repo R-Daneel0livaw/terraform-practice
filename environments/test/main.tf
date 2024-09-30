@@ -39,7 +39,7 @@ module "build-raw-data" {
     {
       name        = "bucket1-lambda1"
       handler     = "bucket1_lambda1.lambda_handler"
-      code_path   = "${path.module}/lambda_code/bucket1_lambda1.py"
+      code_file   = "bucket1_lambda1.py"
       environment = { BUCKET_NAME = module.constants.bucket_name }
       runtime     = "python3.9"
       role_arn    = module.lambda_s3_role_policy.role_arn
