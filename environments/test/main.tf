@@ -35,6 +35,7 @@ module "lambda_s3_role_policy" {
 module "build-raw-data" {
   source      = "../../modules/s3-lambda"
   bucket_name = module.constants.bucket_name
+  directories = ["inbound", "waiting", "completed", "archived"]
   lambda_functions = [
     {
       name        = "bucket1-lambda1"

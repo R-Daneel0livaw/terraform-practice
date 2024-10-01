@@ -2,6 +2,12 @@ resource "aws_s3_bucket" "bucket" {
   bucket = var.bucket_name
 }
 
+resource "aws_s3_object" "directories" {
+  for_each = toset(var.directories)
+  bucket   = aws_s3_bucket.bucket.bucket
+  key      = "${each.value}/"
+}
+
 resource "aws_lambda_function" "lambda" {
   for_each = { for lambda in var.lambda_functions : lambda.name => lambda }
 
