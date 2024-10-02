@@ -1,3 +1,7 @@
+locals {
+  lambda_arns = { for name, lambda in aws_lambda_function.lambda : name => lambda.arn }
+}
+
 resource "aws_s3_bucket" "bucket" {
   bucket = var.bucket_name
 }
@@ -26,10 +30,11 @@ resource "aws_s3_bucket_notification" "s3_bucket_notification" {
   bucket = aws_s3_bucket.bucket.id
 
   dynamic "lambda_function" {
-    for_each = aws_lambda_function.lambda
+    for_each = var.lambda_functions
     content {
-      lambda_function_arn = lambda_function.value.arn
+      lambda_function_arn = local.lambda_arns[lambda_function.value.name]
       events              = ["s3:ObjectCreated:*"]
+      filter_prefix       = "${lambda_function.value.trigger_loc}/"
     }
   }
 }
