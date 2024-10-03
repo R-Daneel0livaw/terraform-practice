@@ -14,7 +14,7 @@ variable "lambda_functions" {
     name        = string
     handler     = string
     code_file   = string
-    trigger_loc = string
+    trigger_loc = optional(string)
     environment = map(string)
     runtime     = string
     role_arn    = string
