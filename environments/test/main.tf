@@ -19,7 +19,7 @@ module "lambda_s3_role_policy" {
       "Effect" : "Allow",
       "Resource" : [
         "arn:aws:s3:::${module.constants.bucket_name}",
-        "arn:aws:s3:::${module.constants.bucket_name}*"
+        "arn:aws:s3:::${module.constants.bucket_name}/*"
       ]
     },
     {
