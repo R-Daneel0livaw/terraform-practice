@@ -22,7 +22,7 @@ resource "aws_lambda_function" "lambda" {
   filename      = data.archive_file.lambda_zip[each.key].output_path
 
   environment {
-    variables = each.value.environment
+    variables = lookup(each.value, "environment", {}) 
   }
 }
 
@@ -34,7 +34,8 @@ resource "aws_s3_bucket_notification" "s3_bucket_notification" {
     content {
       lambda_function_arn = local.lambda_arns[lambda_function.value.name]
       events              = ["s3:ObjectCreated:*"]
-      filter_prefix = lambda_function.value.trigger_loc != null ? "${lambda_function.value.trigger_loc}/" : null
+      filter_prefix       = lookup(lambda_function.value, "trigger_loc", null) != null ? "${lookup(lambda_function.value, "trigger_loc", "")}/" : null
+      # filter_prefix = lambda_function.value.trigger_loc != null ? "${lambda_function.value.trigger_loc}/" : null
     }
   }
 }
