@@ -35,7 +35,6 @@ resource "aws_s3_bucket_notification" "s3_bucket_notification" {
       lambda_function_arn = local.lambda_arns[lambda_function.value.name]
       events              = ["s3:ObjectCreated:*"]
       filter_prefix       = lookup(lambda_function.value, "trigger_loc", null) != null ? "${lookup(lambda_function.value, "trigger_loc", "")}/" : null
-      # filter_prefix = lambda_function.value.trigger_loc != null ? "${lambda_function.value.trigger_loc}/" : null
     }
   }
 }
