@@ -6,6 +6,11 @@ module "constants" {
   source = "../../modules/global-constants"
 }
 
+resource "aws_sqs_queue" "waiting_queue" {
+  name                       = "waiting-queue"
+  visibility_timeout_seconds = 30
+}
+
 module "lambda_s3_role_policy" {
   source                = "../../modules/iam-policy"
   role_name             = "lambda-s3-role"
@@ -23,6 +28,15 @@ module "lambda_s3_role_policy" {
       ]
     },
     {
+      "Action" : [
+        "sqs:SendMessage"
+      ],
+      "Effect" : "Allow",
+      "Resource" : [
+        aws_sqs_queue.waiting_queue.arn
+      ]
+    },
+    {
       "Action" : ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
       "Effect" : "Allow",
       "Resource" : [
@@ -32,7 +46,7 @@ module "lambda_s3_role_policy" {
   ]
 }
 
-module "build-raw-data" {
+module "build_raw_data" {
   source      = "../../modules/s3-lambda"
   bucket_name = module.constants.bucket_name
   directories = ["inbound", "waiting", "completed", "archived"]
