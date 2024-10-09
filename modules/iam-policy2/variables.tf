@@ -6,11 +6,13 @@ variable "role_name" {
 variable "policy_name" {
   type        = string
   description = "Name of the policy"
+  default     = null
 }
 
 variable "policy_document" {
   type        = string
   description = "The JSON policy document"
+  default     = null
 }
 
 variable "managed_policy_arns" {
