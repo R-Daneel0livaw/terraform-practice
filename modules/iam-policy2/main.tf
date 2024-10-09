@@ -6,8 +6,7 @@ resource "aws_iam_role_policy" "inline_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "managed_policy_attachments" {
-  count      = length(var.managed_policy_arns) > 0 ? 1 : 0
-  for_each   = toset(var.managed_policy_arns)
+  for_each   = toset(var.managed_policy_arns) # Using for_each to loop over each policy ARN
   role       = var.role_name
   policy_arn = each.value
 }
