@@ -30,6 +30,13 @@ data "aws_iam_policy_document" "s3_access_policy" {
     ]
   }
 
+  statement {
+    actions = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
+    resources = [
+      "arn:aws:logs:*:*:*"
+    ]
+  }
+
   # statement {
   #   actions = ["sqs:SendMessage"]
   #   resources = [
