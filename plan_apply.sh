@@ -32,7 +32,7 @@ while IFS= read -r line || [[ -n "$line" ]]; do
     fi
   fi
 
-  cd - > /dev/null
+  cd - > /dev/null || { echo "Failed to return to the previous directory"; exit 1; }
 
 done < "$modules_file"
 
