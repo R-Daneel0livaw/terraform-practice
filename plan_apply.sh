@@ -1,35 +1,39 @@
 #!/bin/bash
 
-if [[ $# -lt 2 ]]; then
-    echo "Usage: $0 <modules_file.txt> <plan|apply>"
-    exit 1
-fi
-
 modules_file="$1"
-operation="$2"
+action="$2"  
 
-if [[ "$operation" != "plan" && "$operation" != "apply" ]]; then
-    echo "Operation must be either 'plan' or 'apply'"
-    exit 1
+if [[ "$action" != "apply" && "$action" != "plan" ]]; then
+  echo "Error: Action must be 'apply' or 'plan'."
+  exit 1
 fi
 
-while IFS= read -r line; do
-    directory=$(echo "$line" | awk '{print $1}')
-    target_module=$(echo "$line" | awk '{print $2}')
+while IFS= read -r line || [[ -n "$line" ]]; do
+  path=$(echo "$line" | cut -d ' ' -f1)
+  module=$(echo "$line" | cut -d ' ' -f2)
 
-    echo "Changing directory to: $directory"
-    cd "$directory" || { echo "Failed to change directory to $directory"; exit 1; }
+  echo "Processing directory: $path"
+  
+  cd "$path" || exit 1
 
-    if [[ -n "$target_module" ]]; then
-        echo "Running terraform $operation for target: $target_module"
-        terraform "$operation" --target="$target_module" -auto-approve
+  if [ -z "$module" ]; then
+    echo "No module specified, running on entire configuration."
+    if [[ "$action" == "apply" ]]; then
+      terraform apply -auto-approve
     else
-        echo "Running terraform $operation for the entire configuration"
-        terraform "$operation" -auto-approve
+      terraform plan
     fi
+  else
+    echo "Targeting module: $module"
+    if [[ "$action" == "apply" ]]; then
+      terraform apply -target="$module" -auto-approve
+    else
+      terraform plan -target="$module"
+    fi
+  fi
 
-    cd - > /dev/null || { echo "Failed to return to the previous directory"; exit 1; }
+  cd - > /dev/null
 
 done < "$modules_file"
 
-echo "All modules processed successfully!"
+echo "All modules processed!"
