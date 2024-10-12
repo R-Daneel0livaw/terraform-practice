@@ -59,6 +59,22 @@ module "s3_access_policy" {
 }
 
 
+module "build_raw_data" {
+  source      = "../../modules/s3-lambda"
+  bucket_name = module.constants.bucket_name
+  directories = ["inbound", "waiting", "completed", "archived"]
+  lambda_functions = [
+    {
+      name        = "bucket1-lambda1"
+      handler     = "bucket1_lambda1.lambda_handler"
+      code_file   = "bucket1_lambda1.py"
+      trigger_loc = "inbound"
+      environment = { BUCKET_NAME = module.constants.bucket_name }
+      runtime     = "python3.9"
+      role_arn    = module.iam_role.role_arn
+    },
+  ]
+}
 
 
 
@@ -99,22 +115,5 @@ module "s3_access_policy" {
 #         "arn:aws:logs:*:*:*"
 #       ]
 #     }
-#   ]
-# }
-
-# module "build_raw_data" {
-#   source      = "../../modules/s3-lambda"
-#   bucket_name = module.constants.bucket_name
-#   directories = ["inbound", "waiting", "completed", "archived"]
-#   lambda_functions = [
-#     {
-#       name        = "bucket1-lambda1"
-#       handler     = "bucket1_lambda1.lambda_handler"
-#       code_file   = "bucket1_lambda1.py"
-#       trigger_loc = "inbound"
-#       environment = { BUCKET_NAME = module.constants.bucket_name }
-#       runtime     = "python3.9"
-#       role_arn    = module.lambda_s3_role_policy.role_arn
-#     },
 #   ]
 # }
