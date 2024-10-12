@@ -1,7 +1,8 @@
 #!/bin/bash
 
-modules_file="$1"
-operation="$2"  
+operation="$1"  
+modules_file="$2"
+base_path="environments"
 
 if [[ "$operation" != "apply" && "$operation" != "plan" ]]; then
   echo "Error: Operation must be 'apply' or 'plan'."
@@ -9,10 +10,11 @@ if [[ "$operation" != "apply" && "$operation" != "plan" ]]; then
 fi
 
 while IFS= read -r line || [[ -n "$line" ]]; do
-  path=$(echo "$line" | cut -d ' ' -f1)
-  module=$(echo "$line" | cut -d ' ' -f2)
+  path="${base_path}/$(awk '{print $1}' <<< "$line")"
+  module=$(awk '{print $2}' <<< "$line")
 
   echo "Processing directory: $path"
+  echo "For module: ${module:-ALL}"
   
   cd "$path" || exit 1
 
