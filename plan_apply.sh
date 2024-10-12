@@ -2,7 +2,7 @@
 
 operation="$1"  
 modules_file="$2"
-base_path="environments"
+base_path="projects"
 
 if [[ "$operation" != "apply" && "$operation" != "plan" ]]; then
   echo "Error: Operation must be 'apply' or 'plan'."
