@@ -10,12 +10,14 @@ if [[ "$operation" != "apply" && "$operation" != "plan" ]]; then
 fi
 
 while IFS= read -r line || [[ -n "$line" ]]; do
-  path="${base_path}/$(awk '{print $1}' <<< "$line")"
-  module=$(awk '{print $2}' <<< "$line")
+  project=$(awk '{print $1}' <<< "$line")
+  path="${base_path}/${project}/$(awk '{print $2}' <<< "$line")"
+  module=$(awk '{print $3}' <<< "$line")
 
-  echo "Processing directory: $path"
+  echo "In project: $project"
+  echo "Proecessing directory: $path"
   echo "For module: ${module:-ALL}"
-  
+
   cd "$path" || exit 1
 
   if [ -z "$module" ]; then
