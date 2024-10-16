@@ -8,7 +8,6 @@ terraform {
   }
 }
 
-
 module "constants" {
   source = "../../../../modules/global-constants"
 }
