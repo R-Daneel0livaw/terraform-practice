@@ -24,7 +24,7 @@ resource "aws_lambda_function" "lambda" {
   role          = data.terraform_remote_state.foundation.outputs.lambda_role_arn
   handler       = "bucket1_lambda1.lambda_handler"
   runtime       = "python3.9"
-  filename      = data.archive_file.lambda_zip[each.key].output_path
+  filename      = data.archive_file.lambda_zip.output_path
 
   environment {
     variables = {
