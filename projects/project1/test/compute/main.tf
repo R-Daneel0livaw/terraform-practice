@@ -33,24 +33,6 @@ resource "aws_lambda_function" "lambda" {
   }
 }
 
-resource "aws_iam_role_policy" "lambda_s3_policy" {
-  role = data.terraform_remote_state.foundation.outputs.lambda_role_arn
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = ["s3:GetObject", "s3:ListBucket"]
-        Effect = "Allow"
-        Resource = [
-          "${data.terraform_remote_state.foundation.outputs.bucket_arn}",
-          "${data.terraform_remote_state.foundation.outputs.bucket_arn}/*"
-        ]
-      }
-    ]
-  })
-}
-
 data "archive_file" "lambda_zip" {
   type        = "zip"
   source_file = "${path.module}/lambda_code/bucket1_lambda1.py"
