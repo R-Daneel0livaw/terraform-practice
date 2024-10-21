@@ -17,15 +17,10 @@ module "sqs_queue" {
   queue_name = "waiting"
 }
 
-resource "aws_s3_bucket" "foundation_bucket" {
-  bucket = "my-foundation-bucket"
-}
-
-
-resource "aws_s3_object" "directories" {
-  for_each = toset(module.constants.directories)
-  bucket   = aws_s3_bucket.foundation_bucket.bucket
-  key      = "${each.value}/"
+module "build_raw_data_bucket" {
+  source      = "../../../../modules/s3"
+  bucket_name = module.constants.bucket_name
+  directories = ["inbound", "waiting", "completed", "archived"]
 }
 
 resource "aws_iam_role" "lambda_role" {
