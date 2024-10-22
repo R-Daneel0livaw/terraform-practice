@@ -12,19 +12,26 @@ module "constants" {
   source = "../../../../modules/global-constants"
 }
 
-module "sqs_queue" {
+module "waiting_sqs_queue" {
   source     = "../../../../modules/sqs"
   queue_name = "waiting"
 }
 
-module "build_raw_data_bucket" {
-  source      = "../../../../modules/s3"
-  bucket_name = module.constants.bucket_name
-  directories = ["inbound", "waiting", "completed", "archived"]
+module "completed_sqs_queue" {
+  source     = "../../../../modules/sqs"
+  queue_name = "completed"
 }
 
-resource "aws_iam_role" "lambda_role" {
-  name = "lambda-execution-role"
+module "build_raw_data_bucket" {
+  source      = "../../../../modules/s3"
+  bucket_name = module.constants.build_raw_data_bucket_name
+  directories = module.constants.directories
+}
+
+module "lambda_execution_role" {
+  source = "../../../../modules/iam-role"
+
+  role_name = "lambda-execution-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -38,4 +45,9 @@ resource "aws_iam_role" "lambda_role" {
       }
     ]
   })
+
+  tags = {
+    Environment = "test"
+    ManagedBy   = "terraform"
+  }
 }
