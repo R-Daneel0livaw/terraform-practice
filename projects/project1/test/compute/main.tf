@@ -22,37 +22,17 @@ module "constants" {
 module "lambda_function" {
   source = "../../../../modules/lambda"
 
-  function_name        = "bucket1-lambda1"
-  role_arn             = data.terraform_remote_state.foundation.outputs.lambda_role_arn
-  handler              = "bucket1_lambda1.lambda_handler"
-  runtime              = "python3.9"
-  source_file_path     = "${path.module}/lambda_code/bucket1_lambda1.py"
-  
-  environment_variables = {
-    BUCKET_NAME = module.constants.bucket_name
-  }
+  bucket_id = data.terraform_remote_state.foundation.outputs.bucket_id
+  bucket_arn = data.terraform_remote_state.foundation.outputs.bucket_arn
+  lambda_functions = [
+    {
+      function_name    = "bucket1-lambda1"
+      handler          = "bucket1_lambda1.lambda_handler"
+      source_file_path = "bucket1_lambda1.py"
+      trigger_loc      = "inbound"
+      environment      = { BUCKET_NAME = module.constants.build_raw_data_bucket_name }
+      runtime          = "python3.9"
+      role_arn         = data.terraform_remote_state.foundation.outputs.lambda_role_arn
+    },
+  ]
 }
-
-output "lambda_arn" {
-  value = module.lambda_function.lambda_arn
-}
-
-# resource "aws_lambda_function" "lambda" {
-#   function_name = "bucket1-lambda1"
-#   role          = data.terraform_remote_state.foundation.outputs.lambda_role_arn
-#   handler       = "bucket1_lambda1.lambda_handler"
-#   runtime       = "python3.9"
-#   filename      = data.archive_file.lambda_zip.output_path
-
-#   environment {
-#     variables = {
-#       BUCKET_NAME = module.constants.bucket_name
-#     }
-#   }
-# }
-
-# data "archive_file" "lambda_zip" {
-#   type        = "zip"
-#   source_file = "${path.module}/lambda_code/bucket1_lambda1.py"
-#   output_path = "${path.module}/bucket1-lambda1.zip"
-# }

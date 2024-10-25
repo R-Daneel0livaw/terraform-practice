@@ -1,30 +1,22 @@
-variable "function_name" {
-  description = "The name of the Lambda function"
+variable "bucket_id" {
   type        = string
+  description = "The id of the S3 bucket."
 }
 
-variable "role_arn" {
-  description = "The ARN of the IAM role to assign to the Lambda function"
+variable "bucket_arn" {
   type        = string
+  description = "The arn of the S3 bucket."
 }
 
-variable "source_file_path" {
-  description = "Path to the Lambda function source file"
-  type        = string
-}
-
-variable "handler" {
-  description = "The Lambda function handler (entry point)"
-  type        = string
-}
-
-variable "runtime" {
-  description = "The runtime for the Lambda function"
-  type        = string
-}
-
-variable "environment_variables" {
-  description = "Key-value pairs of environment variables for the Lambda function"
-  type        = map(string)
-  default     = {}
+variable "lambda_functions" {
+  type = list(object({
+    function_name    = string
+    handler          = string
+    source_file_path = string
+    trigger_loc      = optional(string)
+    environment      = optional(map(string))
+    runtime          = string
+    role_arn         = string
+  }))
+  description = "The Lambda functions to attach."
 }
