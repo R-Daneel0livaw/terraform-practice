@@ -5,7 +5,14 @@ variable "bucket_id" {
 
 variable "bucket_arn" {
   type        = string
-  description = "The arn of the S3 bucket."
+  description = "ARN of the S3 bucket to trigger the Lambda function"
+  default     = null
+}
+
+variable "sqs_queue_arn" {
+  description = "ARN of the SQS queue to trigger the Lambda function"
+  type        = string
+  default     = null
 }
 
 variable "lambda_functions" {

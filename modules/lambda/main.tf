@@ -25,12 +25,13 @@ resource "aws_lambda_function" "lambda" {
 }
 
 resource "aws_s3_bucket_notification" "s3_bucket_notification" {
+  count  = var.bucket_id != null ? 1 : 0
   bucket = var.bucket_id
 
   dynamic "lambda_function" {
-    for_each = var.lambda_functions
+    for_each = aws_lambda_function.lambda
     content {
-      lambda_function_arn = local.lambda_arns[lambda_function.value.name]
+      lambda_function_arn = lambda_function.value.arn
       events              = ["s3:ObjectCreated:*"]
       filter_prefix       = lookup(lambda_function.value, "trigger_loc", null) != null ? "${lookup(lambda_function.value, "trigger_loc", "")}/" : null
     }
@@ -38,11 +39,18 @@ resource "aws_s3_bucket_notification" "s3_bucket_notification" {
 }
 
 resource "aws_lambda_permission" "allow_s3_invocation" {
-  for_each = aws_lambda_function.lambda
+  count = var.bucket_arn != null ? length(aws_lambda_function.lambda) : 0
 
-  statement_id  = "AllowS3Invoke-${each.key}"
+  statement_id  = "AllowS3Invoke-${aws_lambda_function.lambda[count.index].function_name}"
   action        = "lambda:InvokeFunction"
-  function_name = each.value.function_name
+  function_name = aws_lambda_function.lambda[count.index].function_name
   principal     = "s3.amazonaws.com"
   source_arn    = var.bucket_arn
+}
+
+resource "aws_lambda_event_source_mapping" "sqs_trigger" {
+  count           = var.sqs_queue_arn != null ? length(aws_lambda_function.lambda) : 0
+
+  event_source_arn = var.sqs_queue_arn
+  function_name    = aws_lambda_function.lambda[count.index].arn
 }
