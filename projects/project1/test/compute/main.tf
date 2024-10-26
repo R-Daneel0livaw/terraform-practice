@@ -22,8 +22,11 @@ module "constants" {
 module "lambda_function" {
   source = "../../../../modules/lambda"
 
-  bucket_id  = data.terraform_remote_state.foundation.outputs.bucket_info.id
-  bucket_arn = data.terraform_remote_state.foundation.outputs.bucket_info.arn
+  bucket = {
+    id  = data.terraform_remote_state.foundation.outputs.bucket_info.id
+    arn = data.terraform_remote_state.foundation.outputs.bucket_info.arn
+  }
+
   lambda_functions = [
     {
       function_name    = "bucket1-lambda1"

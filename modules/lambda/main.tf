@@ -25,8 +25,8 @@ resource "aws_lambda_function" "lambda" {
 }
 
 resource "aws_s3_bucket_notification" "s3_bucket_notification" {
-  count  = var.bucket_id != null ? 1 : 0
-  bucket = var.bucket_id
+  count  = var.bucket.id != null && var.bucket.arn != null ? 1 : 0
+  bucket = var.bucket.id
 
   dynamic "lambda_function" {
     for_each = aws_lambda_function.lambda
@@ -39,13 +39,13 @@ resource "aws_s3_bucket_notification" "s3_bucket_notification" {
 }
 
 resource "aws_lambda_permission" "allow_s3_invocation" {
-  count = var.bucket_arn != null ? length(aws_lambda_function.lambda) : 0
+  count = var.bucket.id != null && var.bucket.arn != null ? length(aws_lambda_function.lambda) : 0
 
   statement_id  = "AllowS3Invoke-${aws_lambda_function.lambda[count.index].function_name}"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda[count.index].function_name
   principal     = "s3.amazonaws.com"
-  source_arn    = var.bucket_arn
+  source_arn    = var.bucket.arn
 }
 
 resource "aws_lambda_event_source_mapping" "sqs_trigger" {
