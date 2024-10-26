@@ -1,9 +1,9 @@
 variable "bucket" {
+  description = "Object containing the ID and ARN of the S3 bucket to trigger the Lambda function."
   type = object({
     id  = string
     arn = string
   })
-  description = "Object containing the ID and ARN of the S3 bucket to trigger the Lambda function."
   default = {
     id  = null
     arn = null
@@ -17,6 +17,7 @@ variable "sqs_queue_arn" {
 }
 
 variable "lambda_functions" {
+  description = "The Lambda functions to attach."
   type = list(object({
     function_name    = string
     handler          = string
@@ -26,5 +27,4 @@ variable "lambda_functions" {
     runtime          = string
     role_arn         = string
   }))
-  description = "The Lambda functions to attach."
 }
