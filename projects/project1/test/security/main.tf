@@ -22,20 +22,8 @@ data "terraform_remote_state" "compute" {
   }
 }
 
-resource "aws_iam_role_policy" "lambda_s3_policy" {
-  role = data.terraform_remote_state.foundation.outputs.lambda_role_arn
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = ["s3:GetObject", "s3:ListBucket"]
-        Effect = "Allow"
-        Resource = [
-          "${data.terraform_remote_state.foundation.outputs.bucket_arn}",
-          "${data.terraform_remote_state.foundation.outputs.bucket_arn}/*"
-        ]
-      }
-    ]
-  })
+module "lambda_s3_policy" {
+  source     = "../../../../modules/policy"
+  role_arn   = data.terraform_remote_state.foundation.outputs.lambda_role_arn
+  bucket_arn = data.terraform_remote_state.foundation.outputs.bucket_arn
 }
