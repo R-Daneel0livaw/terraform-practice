@@ -10,3 +10,11 @@ output "bucket_info" {
 output "lambda_role_arn" {
   value = module.lambda_execution_role.role_arn
 }
+
+output "waiting_sqs_queue_arn" {
+  value = module.waiting_sqs_queue.arn
+}
+
+output "completed_sqs_queue_arn" {
+  value = module.completed_sqs_queue.arn
+}

@@ -22,8 +22,36 @@ data "terraform_remote_state" "compute" {
   }
 }
 
-module "lambda_s3_policy" {
-  source     = "../../../../modules/policy"
-  role_arn   = data.terraform_remote_state.foundation.outputs.lambda_role_arn
-  bucket_arn = data.terraform_remote_state.foundation.outputs.bucket_arn
+module "lambda_policy" {
+  source = "../../../../modules/policy"
+
+  role_arn = data.terraform_remote_state.foundation.outputs.lambda_role_arn
+  policy_statements = [
+    {
+      actions   = ["s3:GetObject", "s3:ListBucket"]
+      effect    = "Allow"
+      resources = [
+        data.terraform_remote_state.foundation.outputs.bucket_info.arn,
+        "${data.terraform_remote_state.foundation.outputs.bucket_info.arn}/*"
+      ]
+    },
+    {
+      actions   = ["sqs:SendMessage"]
+      effect    = "Allow"
+      resources = [
+        data.terraform_remote_state.foundation.outputs.waiting_sqs_queue_arn,
+        data.terraform_remote_state.foundation.outputs.completed_sqs_queue_arn,
+        
+      ]
+    },
+    {
+      actions   = [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ]
+      effect    = "Allow"
+      resources = ["arn:aws:logs:*:*:*"]
+    }
+  ]
 }
