@@ -39,8 +39,8 @@ module "lambda_policy" {
       actions   = ["sqs:SendMessage"]
       effect    = "Allow"
       resources = [
-        data.terraform_remote_state.foundation.outputs.waiting_sqs_queue_arn,
-        data.terraform_remote_state.foundation.outputs.completed_sqs_queue_arn,
+        data.terraform_remote_state.foundation.outputs.sqs_queue_arns.waiting,
+        data.terraform_remote_state.foundation.outputs.sqs_queue_arns.completed,
         
       ]
     },
