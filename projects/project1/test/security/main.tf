@@ -44,14 +44,5 @@ module "lambda_policy" {
         
       ]
     },
-    # {
-    #   actions   = [
-    #     "logs:CreateLogGroup",
-    #     "logs:CreateLogStream",
-    #     "logs:PutLogEvents"
-    #   ]
-    #   effect    = "Allow"
-    #   resources = ["arn:aws:logs:*:*:*"]
-    # }
   ]
 }
