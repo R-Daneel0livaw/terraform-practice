@@ -9,7 +9,7 @@ terraform {
 }
 
 module "constants" {
-  source = "../../../../modules/global-constants"
+  source = "../global-constants"
 }
 
 module "waiting_sqs_queue" {

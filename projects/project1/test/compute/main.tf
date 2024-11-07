@@ -16,7 +16,7 @@ data "terraform_remote_state" "foundation" {
 }
 
 module "constants" {
-  source = "../../../../modules/global-constants"
+  source = "../global-constants"
 }
 
 module "lambda_function" {
