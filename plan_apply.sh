@@ -25,10 +25,8 @@ case "$operation" in
   "plan-destroy")  tf_command="plan -destroy" ;;
 esac
 
-while IFS= read -r line || [[ -n "$line" ]]; do
-  project=$(awk '{print $1}' <<< "$line")
-  path="${base_path}/${project}/$(awk '{print $2}' <<< "$line")"
-  module=$(awk '{print $3}' <<< "$line")
+while IFS=' ' read -r project dir module || [[ -n "$project" ]]; do
+  path="${base_path}/${project}/${dir}"
 
   echo "In project: $project"
   echo "Processing directory: $path"
