@@ -1,10 +1,10 @@
 #!/bin/bash
 
-operation="$1"  
+operation="$1"
 modules_file="$2"
 base_path="projects"
 
-if [[ "$operation" != "apply" && "$operation" != "plan" && "$operation" != "apply-destroy" && "$operation" != "plan-destroy" ]]; then
+if [[ ! "$operation" =~ ^(apply|plan|apply-destroy|plan-destroy)$ ]]; then
   echo "Error: Operation must be 'apply', 'plan', 'apply-destroy', or 'plan-destroy'."
   exit 1
 fi
@@ -17,6 +17,13 @@ if [[ "$operation" == "apply-destroy" || "$operation" == "plan-destroy" ]]; then
     exit 0
   fi
 fi
+
+case "$operation" in
+  "apply")         tf_command="apply -auto-approve" ;;
+  "plan")          tf_command="plan" ;;
+  "apply-destroy") tf_command="destroy -auto-approve" ;;
+  "plan-destroy")  tf_command="plan -destroy" ;;
+esac
 
 while IFS= read -r line || [[ -n "$line" ]]; do
   project=$(awk '{print $1}' <<< "$line")
@@ -31,28 +38,10 @@ while IFS= read -r line || [[ -n "$line" ]]; do
 
   if [ -z "$module" ]; then
     echo "No module specified, running on entire configuration."
-
-    if [[ "$operation" == "apply" ]]; then
-      terraform apply -auto-approve
-    elif [[ "$operation" == "plan" ]]; then
-      terraform plan
-    elif [[ "$operation" == "apply-destroy" ]]; then
-      terraform destroy -auto-approve
-    elif [[ "$operation" == "plan-destroy" ]]; then
-      terraform plan -destroy
-    fi
+    terraform "$tf_command"
   else
     echo "Targeting module: $module"
-
-    if [[ "$operation" == "apply" ]]; then
-      terraform apply -target="$module" -auto-approve
-    elif [[ "$operation" == "plan" ]]; then
-      terraform plan -target="$module"
-    elif [[ "$operation" == "apply-destroy" ]]; then
-      terraform destroy -target="$module" -auto-approve
-    elif [[ "$operation" == "plan-destroy" ]]; then
-      terraform plan -destroy -target="$module"
-    fi
+    terraform "$tf_command" -target="$module"
   fi
 
   cd - > /dev/null || { echo "Failed to return to the previous directory"; exit 1; }
